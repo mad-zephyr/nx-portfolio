@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preinstall": "npx npm-force-resolutions",
+    "install": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",

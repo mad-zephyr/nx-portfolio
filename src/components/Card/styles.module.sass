@@ -1,0 +1,60 @@
+.card
+    position: relative
+    display: flex
+    justify-content: center
+    align-items: center
+    place-content: center
+    width: 200px
+    height: 200px
+    user-select: none
+
+    &::before, &::after
+        content: ""
+        position: absolute
+        background: rgba(#fff, 0.2)
+        z-index: 10
+
+    &::before
+        left: 0
+        bottom: -3%
+        height: calc( 6% + 1px )
+        width: 1px
+
+    &::after
+        bottom: 0
+        left: -3%
+        width: calc( 6% + 1px )
+        height: 1px
+
+.inner
+    position: relative
+    display: flex
+    justify-content: center
+    align-items: center
+    aspect-ratio: 1
+    width: 50%
+    height: auto
+    // backdrop-filter: blur(20px)
+    // background: rgba(217, 217, 217, 0.1)
+
+    &:before
+        content: ""
+        position: absolute
+        width: calc(100% - 50px)
+        height: calc(100% - 50px)
+        background-color: #7724e2
+        box-shadow: 5px 5px 25px 25px #7724e2
+        margin: auto
+        inset: 0
+        z-index: -2
+        opacity: 0
+        transform: rotate(-1deg)
+        transition: opacity .6s ease
+
+    &:hover
+        &:before
+            opacity: 1
+
+    img
+        object-fit: cover
+        user-select: none

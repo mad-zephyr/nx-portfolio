@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, PropsWithChildren } from "react";
-import { Box as B } from "@react-three/flex";
-import { TBoxProps } from "../../types";
+import { Box as B, BoxProps } from "@react-three/flex";
 
-type TBox = {} & Partial<TBoxProps>;
+type TBox = {} & Partial<BoxProps>;
 
 export const Box: FC<PropsWithChildren<TBox>> = ({ children, ...props }) => {
   //@ts-ignore

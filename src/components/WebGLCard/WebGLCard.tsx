@@ -82,10 +82,11 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
   const group = useRef<Group>(null);
 
   return (
-    <group ref={group} position={[0, 0, 0.001]}>
+    <group ref={group} position={[0, 0, 0.0001]}>
       <BorderBox width={5} height={5} />
       <Flex
         size={[5, 5, 0]}
+        position={[0, 0, 0.2]}
         flexDirection="column"
         justifyContent="space-between"
       >
@@ -103,10 +104,10 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
             justifyContent="space-between"
             alignItems="center"
           >
+            {/* текст */}
             <Box>
               <Text fontSize={0.16}>Google {i}</Text>
             </Box>
-
             <Box>
               <Text fontSize={0.16}>ZEDD IN THE PARK</Text>
             </Box>
@@ -153,6 +154,15 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
           </Box>
         </Flex>
       </Flex>
+      <mesh position={[0, 0, 0.0002]}>
+        <planeGeometry args={[5, 5]} />
+        <meshBasicMaterial
+          color="#0df34a"
+          transparent
+          opacity={0.2}
+          map={texture}
+        />
+      </mesh>
     </group>
   );
 }

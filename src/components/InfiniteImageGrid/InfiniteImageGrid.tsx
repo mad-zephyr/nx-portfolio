@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   MathUtils,
@@ -25,6 +25,36 @@ type InfiniteImageGridProps = {
   lerpFactor?: number;
 };
 
+function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
+  const positions: Vector3[] = [];
+
+  const half = Math.floor(gridSize / 2);
+  const total = gridSize * gridSize;
+
+  let x = 0;
+  let y = 0;
+  let dx = 0;
+  let dy = -1;
+
+  for (let i = 0; i < total; i++) {
+    if (-half <= x && x <= half && -half <= y && y <= half) {
+      positions.push(new Vector3(x * spacing, y * spacing, 0));
+    }
+
+    // поворот против часовой стрелки по спирали
+    if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
+      const temp = dx;
+      dx = -dy;
+      dy = temp;
+    }
+
+    x += dx;
+    y += dy;
+  }
+
+  return positions;
+}
+
 export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   textureUrls,
   gridSize = 10,
@@ -45,24 +75,29 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
 
   const fieldSize = gridSize * spacing;
 
-  const tileWidth = imageSize[0];
-  const tileHeight = imageSize[1];
+  const [tileWidth, tileHeight] = imageSize;
+
   const fieldWidth = gridSize * tileWidth;
   const fieldHeight = gridSize * tileHeight;
 
   const tilePositions = useMemo(() => {
-    const halfGrid = Math.floor(gridSize / 2);
-
-    const tiles = [];
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        tiles.push(
-          new Vector3((x - halfGrid) * spacing, (y - halfGrid) * spacing, 0)
-        );
-      }
-    }
-    return tiles;
+    return generateSpiralPositions(gridSize, spacing);
   }, [gridSize, spacing]);
+
+  useEffect(() => {
+    if (tilePositions.length < 4) return;
+
+    const p1 = tilePositions[0];
+    const p2 = tilePositions[1];
+    const p3 = tilePositions[2];
+    const p4 = tilePositions[3];
+
+    const centerX = (p1.x + p2.x + p3.x + p4.x) / 4;
+    const centerY = (p1.y + p2.y + p3.y + p4.y) / 4;
+
+    targetOffset.current.set(-centerX, -centerY);
+    currentOffset.current.set(-centerX, -centerY);
+  }, [tilePositions]);
 
   useFrame(() => {
     currentOffset.current.lerp(targetOffset.current, lerpFactor);

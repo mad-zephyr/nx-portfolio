@@ -24,40 +24,40 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
     // bottom
     -width / 2,
     -height / 2,
-    0.005,
+    0.001,
     width / 2,
     -height / 2,
-    0.005,
+    0.001,
 
     // right
     width / 2,
     -height / 2,
-    0.005,
+    0.001,
     width / 2,
     height / 2,
-    0.005,
+    0.001,
 
     // top
     width / 2,
     height / 2,
-    0.005,
+    0.001,
     -width / 2,
     height / 2,
-    0.005,
+    0.001,
 
     // left
     -width / 2,
     height / 2,
-    0.005,
+    0.001,
     -width / 2,
     -height / 2,
-    0.005,
+    0.001,
   ]);
 
   geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
 
   return (
-    <group position={[0, 0, 0.01]}>
+    <group position={[0, 0, 0.001]}>
       <primitive
         object={
           new LineSegments(
@@ -75,30 +75,40 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
     </group>
   );
 };
+type TWebGLCard = {
+  img: string;
+  i: number;
+  imageSize?: [number, number];
+};
 
-export function WebGLCard({ img, i }: { img: string; i: number }) {
+export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
   const texture = useLoader(TextureLoader, img);
+
+  const [width, height] = imageSize;
+  const SIZE_STEP = 0.2;
+
+  console.log("CARD: ", imageSize);
 
   const group = useRef<Group>(null);
 
   return (
-    <group ref={group} position={[0, 0, 0.0001]}>
-      <BorderBox width={5} height={5} />
+    <group ref={group} position={[0, 0, 0.001]}>
+      <BorderBox width={width} height={height} />
       <Flex
-        size={[5, 5, 0]}
+        size={[width, height, 0]}
         position={[0, 0, 0.2]}
         flexDirection="column"
         justifyContent="space-between"
       >
         <Flex
-          size={[4.6, 4.6, 0]}
+          size={[width - SIZE_STEP * 2, height - SIZE_STEP * 2, 0]}
           flexDirection="column"
           justifyContent="space-between"
           centerAnchor
         >
           {/* Top */}
           <Box
-            width={4.6}
+            width={width - SIZE_STEP * 2}
             height={0.2}
             flexDirection="row"
             justifyContent="space-between"
@@ -115,22 +125,24 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
 
           {/* Center (image) */}
           <Box
-            width={4.6}
-            height={4.2}
+            width={width - SIZE_STEP * 2}
+            height={height - SIZE_STEP * 4}
             justifyContent="center"
             alignItems="center"
             flexGrow={1}
             centerAnchor
           >
             <mesh>
-              <planeGeometry args={[3.2, 3.2]} />
+              <planeGeometry
+                args={[width / 2 + SIZE_STEP, height / 2 + SIZE_STEP]}
+              />
               <meshBasicMaterial map={texture} transparent />
             </mesh>
           </Box>
 
           {/* Bottom */}
           <Box
-            width={4.6}
+            width={width - SIZE_STEP * 2}
             height={0.2}
             flexDirection="row"
             justifyContent="space-between"
@@ -139,7 +151,7 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
           >
             <Box>
               <Text fontSize={0.13} anchorX="left">
-                EXPERIENCE
+                EXPERIENCE:
               </Text>
             </Box>
             <Box>
@@ -154,10 +166,10 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
           </Box>
         </Flex>
       </Flex>
-      <mesh position={[0, 0, 0.0002]}>
-        <planeGeometry args={[5, 5]} />
+      <mesh position={[0, 0, 0.0001]}>
+        <planeGeometry args={[width, height]} />
         <meshBasicMaterial
-          color="#0df34a"
+          color="#0d93f3"
           transparent
           opacity={0.2}
           map={texture}
@@ -165,4 +177,4 @@ export function WebGLCard({ img, i }: { img: string; i: number }) {
       </mesh>
     </group>
   );
-}
+};

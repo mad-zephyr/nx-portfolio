@@ -29,10 +29,15 @@ export default function Home() {
         className={classes.wrapper}
         camera={{ position: [0, 0, 12], fov: 65 }}
       >
-        <InfiniteImageGrid textureUrls={imagePaths} gridSize={10} spacing={5} />
+        <InfiniteImageGrid
+          textureUrls={imagePaths}
+          gridSize={10}
+          spacing={6}
+          imageSize={[6, 6]}
+        />
         <EffectComposer multisampling={3} enableNormalPass={true}>
           <AntiFisheye strength={matches ? 0.05 : 0.15} />
-          <Noise opacity={0.03} />
+          <Noise opacity={0.05} />
           <Vignette eskil={false} offset={0.15} darkness={0.5} />
         </EffectComposer>
       </Canvas>

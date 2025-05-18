@@ -32,6 +32,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   imageSize = [5, 5],
   lerpFactor = 0.15,
 }) => {
+  console.log("IMAGE: ", imageSize);
   const textures = useLoader(TextureLoader, textureUrls);
   const meshRefs = useRef<Group[]>([]);
   const [isDrag, setIsDrag] = useState(false);
@@ -115,7 +116,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     );
 
     const clampedDelta = baseDelta.clampLength(0, MAX_WORLD_DELTA);
-    const zRatio = distance / BASE_CAMERA_Z;
+    const zRatio = distance / perspectiveCamera.position.z;
     const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
 
     targetOffset.current.add(finalDelta);
@@ -175,7 +176,11 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
             }}
             position={pos.toArray()}
           >
-            <WebGLCard i={i} img={texture.source.data.currentSrc} />
+            <WebGLCard
+              i={i}
+              img={texture.source.data.currentSrc}
+              imageSize={imageSize}
+            />
           </Billboard>
         );
       })}

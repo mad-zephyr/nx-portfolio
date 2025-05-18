@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   MathUtils,
@@ -32,7 +32,6 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   imageSize = [5, 5],
   lerpFactor = 0.15,
 }) => {
-  console.log("IMAGE: ", imageSize);
   const textures = useLoader(TextureLoader, textureUrls);
   const meshRefs = useRef<Group[]>([]);
   const [isDrag, setIsDrag] = useState(false);
@@ -96,31 +95,45 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     setIsDrag(true);
   };
 
-  const handlePointerMove = (e: PointerEvent) => {
-    if (!pointerDown.current || !lastPos.current) return;
-    const current = new Vector2(e.clientX, e.clientY);
-    const delta = current.clone().sub(lastPos.current);
-    lastPos.current = current;
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
+      const current = new Vector2(e.clientX, e.clientY);
 
-    const perspectiveCamera = camera as PerspectiveCamera;
-    const fovInRadians = (perspectiveCamera.fov * Math.PI) / 180;
-    const distance = perspectiveCamera.position.z;
+      if (!lastPos.current) {
+        lastPos.current = current;
+        return;
+      }
 
-    const worldHeight = 2 * Math.tan(fovInRadians / 2) * distance;
-    const aspect = size.width / size.height;
-    const worldWidth = worldHeight * aspect;
+      const delta = current.clone().sub(lastPos.current);
+      lastPos.current = current;
 
-    const baseDelta = new Vector2(
-      (delta.x / size.width) * worldWidth,
-      (-delta.y / size.height) * worldHeight
-    );
+      const perspectiveCamera = camera as PerspectiveCamera;
+      const fovInRadians = (perspectiveCamera.fov * Math.PI) / 180;
+      const distance = perspectiveCamera.position.z;
 
-    const clampedDelta = baseDelta.clampLength(0, MAX_WORLD_DELTA);
-    const zRatio = distance / perspectiveCamera.position.z;
-    const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
+      const worldHeight = 2 * Math.tan(fovInRadians / 2) * distance;
+      const aspect = size.width / size.height;
+      const worldWidth = worldHeight * aspect;
 
-    targetOffset.current.add(finalDelta);
-  };
+      const baseDelta = new Vector2(
+        (delta.x / size.width) * worldWidth,
+        (-delta.y / size.height) * worldHeight
+      );
+
+      const clampedDelta = baseDelta.clampLength(0, MAX_WORLD_DELTA);
+      const zRatio = distance / perspectiveCamera.position.z;
+      const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
+
+      if (pointerDown.current && isDrag) {
+        // полный scroll при перетаскивании
+        targetOffset.current.add(finalDelta);
+      } else {
+        // небольшое движение — hover drift
+        targetOffset.current.add(finalDelta.multiplyScalar(0.05));
+      }
+    },
+    [camera, isDrag, size.height, size.width]
+  );
 
   const handleWheel = (e: WheelEvent) => {
     const perspectiveCamera = camera as PerspectiveCamera;
@@ -161,7 +174,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
         onWheel={handleWheel}
       >
         <planeGeometry args={[fieldWidth * 3, fieldHeight * 3]} />
-        <meshBasicMaterial transparent opacity={0} />
+        <meshBasicMaterial transparent opacity={0.001} />
       </mesh>
 
       {tilePositions.map((pos, i) => {

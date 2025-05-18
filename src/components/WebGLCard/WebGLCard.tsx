@@ -1,6 +1,6 @@
 import { useLoader } from "@react-three/fiber";
 import { Group, TextureLoader } from "three";
-import { FC, PropsWithChildren, useRef } from "react";
+import { FC, PropsWithChildren, useRef, useState } from "react";
 import { Text } from "../Text/Text";
 
 import {
@@ -11,6 +11,7 @@ import {
 } from "three";
 import { Box } from "../Box/Box";
 import { Flex } from "../Flex/Flex";
+import { BlurMaterial } from "../shader/BlurMaterial";
 
 type TBorderBox = { width: number; height: number };
 
@@ -83,11 +84,10 @@ type TWebGLCard = {
 
 export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
   const texture = useLoader(TextureLoader, img);
+  const [hovered, setHovered] = useState<number>(0);
 
   const [width, height] = imageSize;
   const SIZE_STEP = 0.2;
-
-  console.log("CARD: ", imageSize);
 
   const group = useRef<Group>(null);
 
@@ -166,13 +166,22 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
           </Box>
         </Flex>
       </Flex>
-      <mesh position={[0, 0, 0.0001]}>
+      <mesh
+        position={[0, 0, 0.00001]}
+        onPointerOver={() => setHovered(1)}
+        onPointerOut={() => setHovered(0)}
+      >
         <planeGeometry args={[width, height]} />
-        <meshBasicMaterial
-          color="#0d93f3"
+
+        <BlurMaterial
+          uTexture={texture}
+          opacity={0.8}
+          blurStrength={0}
+          blurSize={4}
+          zoomFactor={1.1}
+          colorOverlay="#ffffff"
+          hovered={hovered}
           transparent
-          opacity={0.2}
-          map={texture}
         />
       </mesh>
     </group>

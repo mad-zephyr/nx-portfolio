@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, PropsWithChildren } from "react";
 import { Box as B } from "@react-three/flex";
-import { TBoxProps } from "@/types/types";
+import { TBoxProps } from "../../types";
 
 type TBox = {} & Partial<TBoxProps>;
 

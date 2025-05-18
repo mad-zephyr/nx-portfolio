@@ -3,7 +3,7 @@
 import { InfiniteImageGrid } from "@/components";
 import { AntiFisheye } from "@/components/shader/AntiFisheye";
 
-import classes from "./page.module.css";
+import classes from "./page.module.sass";
 
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
@@ -36,9 +36,9 @@ export default function Home() {
           imageSize={[6, 6]}
         />
         <EffectComposer multisampling={3} enableNormalPass={true}>
-          <AntiFisheye strength={matches ? 0.05 : 0.15} />
+          <AntiFisheye strength={matches ? 0.05 : 0.1} />
           <Noise opacity={0.05} />
-          <Vignette eskil={false} offset={0.15} darkness={0.5} />
+          <Vignette offset={0.15} eskil={false} darkness={1} />
         </EffectComposer>
       </Canvas>
     </section>

@@ -1,9 +1,15 @@
 "use client";
 
-import * as THREE from "three";
-import { useEffect, useMemo, useRef } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import {
+  MathUtils,
+  Object3D,
+  PerspectiveCamera,
+  TextureLoader,
+  Vector2,
+  Vector3,
+} from "three";
 import { Billboard } from "@react-three/drei";
 import { WebGLCard } from "../WebGLCard/WebGLCard";
 
@@ -15,7 +21,9 @@ type InfiniteImageGridProps = {
   lerpFactor?: number;
 };
 
-const SENSITIVITY = 0.1;
+const BASE_CAMERA_Z = 15; // твоя "нормальная" дистанция камеры
+const SENSITIVITY = 1; // можно подстроить под пальцы / мышь
+const MAX_WORLD_DELTA = 2.5; // защита от "рывков"
 
 export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
   textureUrls,
@@ -25,37 +33,40 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
   lerpFactor = 0.15,
 }) => {
   const textures = useLoader(TextureLoader, textureUrls);
-  const meshRefs = useRef<THREE.Object3D[]>([]);
+  const meshRefs = useRef<Object3D[]>([]);
 
-  const velocity = useRef(new THREE.Vector2(0, 0));
-  const targetOffset = useRef(new THREE.Vector2(0, 0));
-  const currentOffset = useRef(new THREE.Vector2(0, 0));
+  const targetOffset = useRef(new Vector2(0, 0));
+  const currentOffset = useRef(new Vector2(0, 0));
 
   const pointerDown = useRef(false);
-  const lastPos = useRef<THREE.Vector2 | null>(null);
+  const lastPos = useRef<Vector2 | null>(null);
 
   const activeIndex = useRef<number | null>(null);
   const scales = useRef<number[]>([]);
-  const displacements = useRef<THREE.Vector2[]>([]);
+  const displacements = useRef<Vector2[]>([]);
 
   const fieldSize = gridSize * spacing;
   const overdraw = 2;
   const half = Math.floor(gridSize / 2) + overdraw;
 
+  const [isDrag, setIsDrag] = useState(false);
+
+  const { camera, size } = useThree();
+
+  useFrame(() => {
+    const targetZ = isDrag ? 14 : 12;
+    camera.position.z = MathUtils.lerp(camera.position.z, targetZ, 0.3);
+  });
+
   const basePositions = useMemo(() => {
-    const result: THREE.Vector3[] = [];
+    const result: Vector3[] = [];
     for (let x = -half; x <= half; x++) {
       for (let y = -half; y <= half; y++) {
-        result.push(new THREE.Vector3(x * spacing, y * spacing, 0));
+        result.push(new Vector3(x * spacing, y * spacing, 0));
       }
     }
     return result;
   }, [half, spacing]);
-
-  useEffect(() => {
-    scales.current = basePositions.map(() => 1);
-    displacements.current = basePositions.map(() => new THREE.Vector2());
-  }, [basePositions]);
 
   useEffect(() => {
     if (basePositions.length === 0) return;
@@ -63,6 +74,9 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
     const center = basePositions[centerIndex];
     targetOffset.current.set(-center.x, -center.y);
     currentOffset.current.set(-center.x, -center.y);
+
+    scales.current = basePositions.map(() => 1);
+    displacements.current = basePositions.map(() => new Vector2());
   }, [basePositions]);
 
   //   const handleTileClick = (index: number) => {
@@ -71,29 +85,75 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
 
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerDown.current = true;
-    lastPos.current = new THREE.Vector2(e.clientX, e.clientY);
+    lastPos.current = new Vector2(e.clientX, e.clientY);
+    setIsDrag(true);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!pointerDown.current || !lastPos.current) return;
-    const current = new THREE.Vector2(e.clientX, e.clientY);
+
+    const perspectiveCamera = camera as PerspectiveCamera;
+
+    const current = new Vector2(e.clientX, e.clientY);
     const delta = current.clone().sub(lastPos.current);
     lastPos.current = current;
-    velocity.current.set(delta.x * SENSITIVITY, -delta.y * SENSITIVITY);
+
+    // === Точный пересчёт worldHeight/Width с учётом текущего Z
+    const fovInRadians = (perspectiveCamera.fov * Math.PI) / 180;
+    const distance = perspectiveCamera.position.z;
+
+    const worldHeight = 2 * Math.tan(fovInRadians / 2) * distance;
+    const aspect = size.width / size.height;
+    const worldWidth = worldHeight * aspect;
+
+    const baseDelta = new Vector2(
+      (delta.x / size.width) * worldWidth,
+      (-delta.y / size.height) * worldHeight
+    );
+
+    // === Ограничим резкие рывки
+    const clampedDelta = baseDelta.clampLength(0, MAX_WORLD_DELTA);
+
+    // === Компенсируем увеличение области при увеличении Z
+    // const zRatio = distance / BASE_CAMERA_Z;
+    const zRatio = distance / perspectiveCamera.position.z;
+    const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
+
+    targetOffset.current.add(finalDelta);
   };
 
   const handlePointerUp = () => {
     pointerDown.current = false;
     lastPos.current = null;
+
+    setIsDrag(false);
   };
 
   const handleWheel = (e: WheelEvent) => {
-    velocity.current.set(e.deltaX * SENSITIVITY, -e.deltaY * SENSITIVITY);
+    const perspectiveCamera = camera as PerspectiveCamera;
+
+    const fovInRadians = (perspectiveCamera.fov * Math.PI) / 180;
+    const distance = perspectiveCamera.position.z;
+
+    const worldHeight = 2 * Math.tan(fovInRadians / 2) * distance;
+    const aspect = size.width / size.height;
+    const worldWidth = worldHeight * aspect;
+
+    const baseDelta = new Vector2(
+      (e.deltaX / size.width) * worldWidth,
+      (-e.deltaY / size.height) * worldHeight
+    );
+
+    const clampedDelta = baseDelta.clampLength(0, 2.5); // чтобы не "вырвало"
+    const zRatio = distance / BASE_CAMERA_Z;
+
+    const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
+    targetOffset.current.add(finalDelta);
   };
 
   useFrame(() => {
-    targetOffset.current.add(velocity.current);
-    velocity.current.multiplyScalar(0.85);
+    // targetOffset.current.add(velocity.current);
+    // velocity.current.multiplyScalar(0.85);
     currentOffset.current.lerp(targetOffset.current, lerpFactor);
 
     const offsetX = currentOffset.current.x;
@@ -105,12 +165,12 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
       return v;
     };
 
-    let activePos: THREE.Vector2 | null = null;
+    let activePos: Vector2 | null = null;
 
     if (activeIndex.current !== null) {
       const base = basePositions[activeIndex.current];
 
-      const wrapped = new THREE.Vector2(
+      const wrapped = new Vector2(
         wrap(base.x + offsetX),
         wrap(base.y + offsetY)
       );
@@ -120,7 +180,7 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
 
       for (const dx of shifts) {
         for (const dy of shifts) {
-          const candidate = new THREE.Vector2(wrapped.x + dx, wrapped.y + dy);
+          const candidate = new Vector2(wrapped.x + dx, wrapped.y + dy);
           const dist = candidate.length();
 
           if (dist < minDist) {
@@ -143,7 +203,7 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
       x = wrap(x);
       y = wrap(y);
 
-      const thisPos = new THREE.Vector2(x, y);
+      const thisPos = new Vector2(x, y);
 
       let isRealActive = false;
       let isCloneOfActive = false;
@@ -162,7 +222,7 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
       const ax = activePos?.x ?? 0;
       const ay = activePos?.y ?? 0;
 
-      let disp = new THREE.Vector2(0, 0);
+      let disp = new Vector2(0, 0);
 
       if (!isRealActive && !isCloneOfActive && activePos) {
         const dx = x - ax;
@@ -171,18 +231,15 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
         const pushStrength = Math.exp(-dist * 0.25) * spacing;
 
         if (pushStrength > 0) {
-          disp = new THREE.Vector2(dx, dy)
-            .normalize()
-            .multiplyScalar(pushStrength);
+          disp = new Vector2(dx, dy).normalize().multiplyScalar(pushStrength);
         }
       }
 
-      if (!displacements.current[i])
-        displacements.current[i] = new THREE.Vector2();
+      if (!displacements.current[i]) displacements.current[i] = new Vector2();
       displacements.current[i].lerp(disp, 0.15);
 
       const finalZ = isRealActive ? 0.5 : 0;
-      const finalPos = new THREE.Vector3(
+      const finalPos = new Vector3(
         x + displacements.current[i].x,
         y + displacements.current[i].y,
         finalZ
@@ -199,7 +256,7 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
   return (
     <>
       <mesh
-        position={[0, 0, -0.01]}
+        position={[0, 0, 0]}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -215,25 +272,22 @@ export const InfiniteImageGrid: React.FC<InfiniteImageGridProps> = ({
         return (
           <Billboard
             key={i}
-            position={pos.toArray()}
+            follow={false}
             ref={(el) => {
               if (el) meshRefs.current[i] = el;
             }}
-            follow={false}
+            position={pos.toArray()}
           >
-            <>
-              <mesh>
-                <planeGeometry args={imageSize} />
-                <meshBasicMaterial transparent map={texture} color="#181717" />
-                {/* <meshBasicMaterial map={texture} transparent  /> */}
-              </mesh>
+            <mesh>
+              <planeGeometry args={imageSize} />
+              <meshBasicMaterial transparent map={texture} color="#181717" />
+            </mesh>
 
-              <WebGLCard img={texture.source.data.currentSrc} />
+            <WebGLCard i={i} img={texture.source.data.currentSrc} />
 
-              {/* <Html center transform occlude position={[0, 0, 0.01]}>
+            {/* <Html center transform occlude position={[0, 0, 0.01]}>
                 <Card key={i} img={texture.source.data.currentSrc} />
               </Html> */}
-            </>
           </Billboard>
         );
       })}

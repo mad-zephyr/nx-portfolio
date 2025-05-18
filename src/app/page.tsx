@@ -7,6 +7,7 @@ import classes from "./page.module.css";
 
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { useMediaQuery } from "usehooks-ts";
 
 const imagePaths = Array.from(
   { length: 27 },
@@ -14,6 +15,8 @@ const imagePaths = Array.from(
 );
 
 export default function Home() {
+  const matches = useMediaQuery("(max-width: 768px)");
+
   return (
     <Canvas
       dpr={[1, 2]}
@@ -28,7 +31,7 @@ export default function Home() {
     >
       <InfiniteImageGrid textureUrls={imagePaths} gridSize={10} spacing={5} />
       <EffectComposer multisampling={3} enableNormalPass={true}>
-        <AntiFisheye strength={0.15} />
+        <AntiFisheye strength={matches ? 0.05 : 0.15} />
         <Noise opacity={0.03} />
         <Vignette eskil={false} offset={0.15} darkness={0.5} />
       </EffectComposer>

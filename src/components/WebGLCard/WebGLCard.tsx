@@ -1,6 +1,6 @@
 import { useLoader } from "@react-three/fiber";
-import { Group, TextureLoader } from "three";
-import { FC, PropsWithChildren, useRef, useState } from "react";
+import { TextureLoader } from "three";
+import { FC, PropsWithChildren, useState } from "react";
 import { Text } from "../Text/Text";
 
 import {
@@ -79,20 +79,21 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
 type TWebGLCard = {
   img: string;
   i: number;
-  imageSize?: [number, number];
+  imageSize: [number, number];
 };
 
-export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
+export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize }) => {
   const texture = useLoader(TextureLoader, img);
   const [hovered, setHovered] = useState<number>(0);
 
-  const [width, height] = imageSize;
-  const SIZE_STEP = 0.2;
+  // const SIZE_STEP = 1 / imageSize[0];
+  const GAP = 1 / imageSize[0];
+  // const GAP = 0.2;
 
-  const group = useRef<Group>(null);
+  const [width, height] = imageSize;
 
   return (
-    <group ref={group} position={[0, 0, 0.001]}>
+    <group position={[0, 0, 0.001]}>
       <BorderBox width={width} height={height} />
       <Flex
         size={[width, height, 0]}
@@ -101,14 +102,14 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
         justifyContent="space-between"
       >
         <Flex
-          size={[width - SIZE_STEP * 2, height - SIZE_STEP * 2, 0]}
+          size={[width - GAP * 2, height - GAP * 2, 0]}
           flexDirection="column"
           justifyContent="space-between"
           centerAnchor
         >
           {/* Top */}
           <Box
-            width={width - SIZE_STEP * 2}
+            width={width - GAP * 2}
             height={0.2}
             flexDirection="row"
             justifyContent="space-between"
@@ -125,24 +126,22 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize = [5, 5] }) => {
 
           {/* Center (image) */}
           <Box
-            width={width - SIZE_STEP * 2}
-            height={height - SIZE_STEP * 4}
+            width={width - GAP * 2}
+            height={height - GAP * 4}
             justifyContent="center"
             alignItems="center"
             flexGrow={1}
             centerAnchor
           >
             <mesh>
-              <planeGeometry
-                args={[width / 2 + SIZE_STEP, height / 2 + SIZE_STEP]}
-              />
+              <planeGeometry args={[width / 2 + GAP, height / 2 + GAP]} />
               <meshBasicMaterial map={texture} transparent />
             </mesh>
           </Box>
 
           {/* Bottom */}
           <Box
-            width={width - SIZE_STEP * 2}
+            width={width - GAP * 2}
             height={0.2}
             flexDirection="row"
             justifyContent="space-between"

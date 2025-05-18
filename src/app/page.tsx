@@ -32,10 +32,9 @@ export default function Home() {
         <InfiniteImageGrid
           textureUrls={imagePaths}
           gridSize={10}
-          spacing={6}
           imageSize={[6, 6]}
         />
-        <EffectComposer multisampling={3} enableNormalPass={true}>
+        <EffectComposer multisampling={2} enableNormalPass={true}>
           <AntiFisheye strength={matches ? 0.05 : 0.1} />
           <Noise opacity={0.05} />
           <Vignette offset={0.15} eskil={false} darkness={1} />

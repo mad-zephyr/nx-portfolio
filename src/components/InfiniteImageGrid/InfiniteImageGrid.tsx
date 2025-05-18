@@ -12,6 +12,7 @@ import {
 } from "three";
 import { Billboard } from "@react-three/drei";
 import { WebGLCard } from "../WebGLCard/WebGLCard";
+import { useResponsiveImageSize } from "@/hooks/useResponsiveImageSize";
 
 const BASE_CAMERA_Z = 15;
 const SENSITIVITY = 1;
@@ -20,7 +21,7 @@ const MAX_WORLD_DELTA = 2.5;
 type InfiniteImageGridProps = {
   textureUrls: string[];
   gridSize?: number;
-  spacing?: number;
+
   imageSize?: [number, number];
   lerpFactor?: number;
 };
@@ -58,13 +59,15 @@ function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
 export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   textureUrls,
   gridSize = 10,
-  spacing = 6,
+
   imageSize = [5, 5],
   lerpFactor = 0.15,
 }) => {
   const textures = useLoader(TextureLoader, textureUrls);
   const meshRefs = useRef<Group[]>([]);
   const [isDrag, setIsDrag] = useState(false);
+
+  const { imageSizes, spacing } = useResponsiveImageSize({ imageSize });
 
   const targetOffset = useRef(new Vector2(0, 0));
   const currentOffset = useRef(new Vector2(0, 0));
@@ -75,7 +78,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
 
   const fieldSize = gridSize * spacing;
 
-  const [tileWidth, tileHeight] = imageSize;
+  const [tileWidth, tileHeight] = imageSizes;
 
   const fieldWidth = gridSize * tileWidth;
   const fieldHeight = gridSize * tileHeight;
@@ -227,7 +230,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
             <WebGLCard
               i={i}
               img={texture.source.data.currentSrc}
-              imageSize={imageSize}
+              imageSize={imageSizes}
             />
           </Billboard>
         );

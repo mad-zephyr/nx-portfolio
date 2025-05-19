@@ -6,7 +6,7 @@ import { AntiFisheye } from "@/components/3d/shader/AntiFisheye";
 import classes from "./page.module.sass";
 
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useMediaQuery } from "usehooks-ts";
 import { ProgressiveBlurEffect } from "@/components/3d/shader/ProgressiveBlur";
 
@@ -37,7 +37,7 @@ export default function Home() {
           imageSize={[6, 6]}
         />
 
-        <EffectComposer multisampling={2} autoClear>
+        <EffectComposer autoClear>
           <ProgressiveBlurEffect
             blurStrength={1.0}
             overlayAlpha={0.05}
@@ -45,7 +45,7 @@ export default function Home() {
             blurArea={matches ? [0.0, 0.82, 1, 0.2] : [0.0, 0.86, 1, 0.085]}
           />
           <AntiFisheye strength={matches ? 0.05 : 0.15} />
-          <Noise opacity={0.04} />
+          {/* <Noise opacity={0.04} /> */}
           <Vignette offset={0.15} darkness={1.2} />
         </EffectComposer>
       </Canvas>

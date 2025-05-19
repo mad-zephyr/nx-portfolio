@@ -1,3 +1,4 @@
+import { Button } from "../ui";
 import classes from "./styles.module.sass";
 
 export const Header = () => {
@@ -8,6 +9,8 @@ export const Header = () => {
       <div className={classes.tag}>
         We create solutions <br /> that work for business
       </div>
+
+      <Button className={classes.cta}> Let`s Talk</Button>
     </header>
   );
 };

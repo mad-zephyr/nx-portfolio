@@ -65,9 +65,9 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
             geometry,
             new LineBasicMaterial({
               color: "white",
-              linewidth: 0.2,
+              linewidth: 1,
               transparent: true,
-              opacity: 0.02,
+              opacity: 0.04,
             })
           )
         }
@@ -86,9 +86,7 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize }) => {
   const texture = useLoader(TextureLoader, img);
   const [hovered, setHovered] = useState<number>(0);
 
-  // const SIZE_STEP = 1 / imageSize[0];
   const GAP = 1 / imageSize[0];
-  // const GAP = 0.2;
 
   const [width, height] = imageSize;
 

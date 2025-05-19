@@ -252,7 +252,6 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
         return (
           <Billboard
             key={i}
-            follow={false}
             ref={(el) => {
               if (el) meshRefs.current[i] = el;
             }}

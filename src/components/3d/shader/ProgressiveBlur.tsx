@@ -13,7 +13,7 @@ uniform float overlayAlpha;
 uniform sampler2D tMap;
 
 float tvNoise(vec2 p, float ta, float tb) {
-  return fract(sin(p.x * ta + p.y * tb) * 5678.0);
+  return fract(sin(p.x * ta + p.y * tb) * 8678.0);
 }
 
 vec3 draw(sampler2D image, vec2 uv) {
@@ -47,8 +47,11 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outColor) {
     uv.y <= (blurArea.y + blurArea.w)
   );
 
-  float verticalFade = smoothstep(blurArea.y, blurArea.y + blurArea.w, uv.y);
-  float effectiveStrength = inBlurArea ? uBlurStrength * verticalFade : 0.0;
+  float blurStart = blurArea.y;
+  float blurEnd = blurArea.y + blurArea.w * 0.7;
+  float verticalFade = inBlurArea ? smoothstep(blurStart, blurEnd, uv.y) : 0.0;
+
+  float effectiveStrength = uBlurStrength * verticalFade;
 
   vec3 base = draw(tMap, uv);
   vec3 blurred = inBlurArea
@@ -60,9 +63,10 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outColor) {
   float t = uTime + 123.0;
   float ta = t * 0.654321;
   float tb = t * (ta * 0.123456);
-  float noise = tvNoise(uv, ta, tb) * 0.01; // 👈 мягкий
+  float noise = tvNoise(uv * 100.0 + vec2(uTime * 0.5, uTime * 0.8), ta, tb) * 0.01 * verticalFade;
 
-  vec3 final = blurred - vec3(noise); // или mix(blurred, vec3(1.0), noise * 0.5);
+  // vec3 final = blurred - vec3(noise); // или mix(blurred, vec3(1.0), noise * 0.5);
+  vec3 final = mix(blurred, vec3(1.0), noise * 0.5);
 
   outColor = vec4(final, 1.0);
 }

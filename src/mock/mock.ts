@@ -4,20 +4,20 @@ const imagePaths = Array.from(
 );
 
 const brands = [
-  "NX Studio",
-  "PixelCore",
-  "NovaDigital",
-  "CodeCraft",
-  "Websmiths",
+  'NX Studio',
+  'PixelCore',
+  'NovaDigital',
+  'CodeCraft',
+  'Websmiths',
 ];
 const projectNames = [
-  "Portfolio Website",
-  "E-Commerce Platform",
-  "Landing Page",
-  "Booking App",
-  "Dashboard",
+  'Portfolio Website',
+  'E-Commerce Platform',
+  'Landing Page',
+  'Booking App',
+  'Dashboard',
 ];
-const experienceTypes = ["UX/UI", "Frontend", "Backend"];
+const experienceTypes = ['UX/UI', 'Frontend', 'Backend'];
 
 const getRandomFromArray = (arr: string[]) =>
   arr[Math.floor(Math.random() * arr.length)];

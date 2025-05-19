@@ -1,7 +1,7 @@
-import clsx from "clsx";
-import { ButtonHTMLAttributes, FC } from "react";
+import clsx from 'clsx';
+import { ButtonHTMLAttributes, FC } from 'react';
 
-import classes from "./styles.module.sass";
+import classes from './styles.module.sass';
 
 type TButton = {} & ButtonHTMLAttributes<HTMLButtonElement>;
 

@@ -1,7 +1,7 @@
-import { useThree } from "@react-three/fiber";
-import { useLayoutEffect, useState } from "react";
-import { PerspectiveCamera } from "three";
-import { useMediaQuery } from "usehooks-ts";
+import { useThree } from '@react-three/fiber';
+import { useLayoutEffect, useState } from 'react';
+import { PerspectiveCamera } from 'three';
+import { useMediaQuery } from 'usehooks-ts';
 
 type TuseResponsiveImageSize = {
   tilesPerRow?: number;
@@ -14,7 +14,7 @@ export function useResponsiveImageSize({
   gap = 0,
   imageSize,
 }: TuseResponsiveImageSize) {
-  const matches = useMediaQuery("(max-width: 768px)");
+  const matches = useMediaQuery('(max-width: 768px)');
 
   const { camera, size } = useThree();
   const [imageSizes, setImageSizes] = useState<[number, number]>(imageSize);

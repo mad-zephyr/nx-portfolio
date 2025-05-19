@@ -1,6 +1,6 @@
 // ProgressiveBlurEffect.tsx
-import { wrapEffect } from "@react-three/postprocessing";
-import { Effect } from "postprocessing";
+import { wrapEffect } from '@react-three/postprocessing';
+import { Effect } from 'postprocessing';
 
 const fragmentShader = /* glsl */ `
 precision highp float;
@@ -80,20 +80,20 @@ export class ProgressiveBlurEffectImpl extends Effect {
     overlayColor = [1.0, 1.0, 1.0], // белый по умолчанию
     overlayAlpha = 0.25,
   } = {}) {
-    super("ProgressiveBlurEffect", fragmentShader, {
+    super('ProgressiveBlurEffect', fragmentShader, {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       uniforms: new Map<string, any>([
-        ["uBlurStrength", { value: blurStrength }],
-        ["blurArea", { value: new Float32Array(blurArea) }],
-        ["overlayColor", { value: new Float32Array(overlayColor) }],
-        ["overlayAlpha", { value: overlayAlpha }],
-        ["uTime", { value: 0 }],
+        ['uBlurStrength', { value: blurStrength }],
+        ['blurArea', { value: new Float32Array(blurArea) }],
+        ['overlayColor', { value: new Float32Array(overlayColor) }],
+        ['overlayAlpha', { value: overlayAlpha }],
+        ['uTime', { value: 0 }],
       ]),
     });
   }
 
   updateTime(delta: number) {
-    const time = this.uniforms.get("uTime");
+    const time = this.uniforms.get('uTime');
     if (time) time.value += delta;
   }
 }

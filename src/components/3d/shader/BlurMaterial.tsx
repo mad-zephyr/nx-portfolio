@@ -1,8 +1,8 @@
 // components/materials/BlurMaterial.ts
-import { shaderMaterial } from "@react-three/drei";
-import { extend, useFrame } from "@react-three/fiber";
-import { FC, useRef } from "react";
-import { Color, MathUtils, ShaderMaterial, Texture } from "three";
+import { shaderMaterial } from '@react-three/drei';
+import { extend, useFrame } from '@react-three/fiber';
+import { FC, useRef } from 'react';
+import { Color, MathUtils, ShaderMaterial, Texture } from 'three';
 
 export const RawBlurMaterial = shaderMaterial(
   {
@@ -92,7 +92,7 @@ export const BlurMaterial: FC<TBlurMaterial> = ({
       ref={blurRef}
       {...rest}
       colorOverlay={
-        typeof colorOverlay === "string"
+        typeof colorOverlay === 'string'
           ? new Color(colorOverlay)
           : colorOverlay
       }
@@ -100,4 +100,4 @@ export const BlurMaterial: FC<TBlurMaterial> = ({
   );
 };
 
-BlurMaterial.displayName = "BlurMaterial";
+BlurMaterial.displayName = 'BlurMaterial';

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, PropsWithChildren } from "react";
-import { Flex as F, FlexProps } from "@react-three/flex";
+import { Flex as F, FlexProps } from '@react-three/flex';
+import { FC, PropsWithChildren } from 'react';
 
 type TFlex = Partial<FlexProps>;
 

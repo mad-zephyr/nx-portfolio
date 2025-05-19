@@ -1,18 +1,20 @@
-"use client";
+'use client';
 
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Billboard } from '@react-three/drei';
+import { useFrame, useLoader, useThree } from '@react-three/fiber';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Group,
   MathUtils,
   PerspectiveCamera,
   TextureLoader,
   Vector2,
   Vector3,
-  Group,
-} from "three";
-import { Billboard } from "@react-three/drei";
-import { WebGLCard } from "../WebGLCard/WebGLCard";
-import { useResponsiveImageSize } from "@/hooks/useResponsiveImageSize";
+} from 'three';
+
+import { useResponsiveImageSize } from '@/hooks/useResponsiveImageSize';
+
+import { WebGLCard } from '../WebGLCard/WebGLCard';
 
 const BASE_CAMERA_Z = 15;
 const SENSITIVITY = 1;
@@ -270,7 +272,6 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
             position={pos.toArray()}
           >
             <WebGLCard
-              i={i}
               img={texture.source.data.currentSrc}
               imageSize={imageSizes}
               card={cards[i % textures.length]}

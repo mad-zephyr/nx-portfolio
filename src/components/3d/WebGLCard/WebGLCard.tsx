@@ -1,17 +1,17 @@
-import { useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three";
-import { FC, PropsWithChildren, useState } from "react";
-import { Text } from "../Text/Text";
-
+import { useLoader } from '@react-three/fiber';
+import { FC, PropsWithChildren, useState } from 'react';
+import { TextureLoader } from 'three';
 import {
-  LineSegments,
-  LineBasicMaterial,
   BufferGeometry,
   Float32BufferAttribute,
-} from "three";
-import { Box } from "../Box/Box";
-import { Flex } from "../Flex/Flex";
-import { BlurMaterial } from "../shader/BlurMaterial";
+  LineBasicMaterial,
+  LineSegments,
+} from 'three';
+
+import { Box } from '../Box/Box';
+import { Flex } from '../Flex/Flex';
+import { BlurMaterial } from '../shader/BlurMaterial';
+import { Text } from '../Text/Text';
 
 type TBorderBox = { width: number; height: number };
 
@@ -55,7 +55,7 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
     0.001,
   ]);
 
-  geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
 
   return (
     <group position={[0, 0, 0.001]}>
@@ -64,7 +64,7 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
           new LineSegments(
             geometry,
             new LineBasicMaterial({
-              color: "white",
+              color: 'white',
               linewidth: 1,
               transparent: true,
               opacity: 0.04,
@@ -87,12 +87,11 @@ type TCard = {
 
 type TWebGLCard = {
   img: string;
-  i: number;
   imageSize: [number, number];
   card: TCard;
 };
 
-export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize, card }) => {
+export const WebGLCard: FC<TWebGLCard> = ({ img, imageSize, card }) => {
   const texture = useLoader(TextureLoader, img);
   const [hovered, setHovered] = useState<number>(0);
 
@@ -169,9 +168,7 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize, card }) => {
             ))}
 
             <Box>
-              <Text fontSize={0.13}>
-                {card.year} {i}
-              </Text>
+              <Text fontSize={0.13}>{card.year}</Text>
             </Box>
           </Box>
         </Flex>

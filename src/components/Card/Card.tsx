@@ -1,6 +1,7 @@
-import { FC } from "react";
-import classes from "./styles.module.sass";
-import Image from "next/image";
+import Image from 'next/image';
+import { FC } from 'react';
+
+import classes from './styles.module.sass';
 
 type TCard = {
   img: string;

@@ -1,7 +1,7 @@
 // AntiFisheyeEffect.js
-import { Uniform, Vector2 } from "three";
-import { Effect } from "postprocessing";
-import { wrapEffect } from "@react-three/postprocessing";
+import { Uniform, Vector2 } from 'three';
+import { Effect } from 'postprocessing';
+import { wrapEffect } from '@react-three/postprocessing';
 
 const fragmentShader = /* glsl */ `
   uniform float uStrength;
@@ -22,11 +22,11 @@ const fragmentShader = /* glsl */ `
 
 class AntiFisheyeImpl extends Effect {
   constructor({ strength = 0.3 } = {}) {
-    super("AntiFisheyeEffect", fragmentShader, {
+    super('AntiFisheyeEffect', fragmentShader, {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       uniforms: new Map<string, Uniform<any>>([
-        ["uStrength", new Uniform(strength)],
-        ["uResolution", new Uniform(new Vector2())],
+        ['uStrength', new Uniform(strength)],
+        ['uResolution', new Uniform(new Vector2())],
       ]),
     });
   }

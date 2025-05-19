@@ -26,13 +26,7 @@ type InfiniteImageGridProps = {
   lerpFactor?: number;
 };
 
-function generateSpiralPositions(
-  gridSize: number,
-  spacing: number,
-  shiftRows: boolean = true
-): Vector3[] {
-  const positions: Vector3[] = [];
-
+function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
   const half = Math.floor(gridSize / 2);
   const total = gridSize * gridSize;
 
@@ -41,18 +35,12 @@ function generateSpiralPositions(
   let dx = 0;
   let dy = -1;
 
+  const rawPositions: { x: number; y: number }[] = [];
+
+  // Этап 1: спиральное заполнение
   for (let i = 0; i < total; i++) {
     if (-half <= x && x <= half && -half <= y && y <= half) {
-      // сначала формируем сдвиг по рядам
-      let shiftedX = x;
-      const shiftedY = y;
-
-      if (shiftRows) {
-        if (y > 0) shiftedX += y; // вниз — вправо
-        else if (y < 0) shiftedX += y; // вверх — влево
-      }
-
-      positions.push(new Vector3(shiftedX * spacing, shiftedY * spacing, 0));
+      rawPositions.push({ x, y });
     }
 
     if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
@@ -65,7 +53,39 @@ function generateSpiralPositions(
     y += dy;
   }
 
-  return positions;
+  // Этап 2: группировка по рядам
+  const rows = new Map<number, { x: number; y: number }[]>();
+  for (const pos of rawPositions) {
+    if (!rows.has(pos.y)) rows.set(pos.y, []);
+    rows.get(pos.y)!.push(pos);
+  }
+
+  // Этап 3: симметричное смещение рядов от центра
+  const result: Vector3[] = [];
+
+  const sortedYs = [...rows.keys()].sort((a, b) => a - b); // сверху вниз
+  for (const y of sortedYs) {
+    const row = rows.get(y)!;
+    const shift = Math.abs(y);
+
+    let shiftedRow: { x: number; y: number }[];
+
+    if (y > 0) {
+      // вниз — сдвигаем влево, переносим слева вправо
+      shiftedRow = [...row.slice(shift), ...row.slice(0, shift)];
+    } else if (y < 0) {
+      // вверх — сдвигаем вправо, переносим справа влево
+      shiftedRow = [...row.slice(-shift), ...row.slice(0, -shift)];
+    } else {
+      shiftedRow = row; // центр без сдвига
+    }
+
+    for (const pos of shiftedRow) {
+      result.push(new Vector3(pos.x * spacing, pos.y * spacing, 0));
+    }
+  }
+
+  return result;
 }
 
 export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({

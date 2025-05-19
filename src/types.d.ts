@@ -12,6 +12,7 @@ declare global {
         colorOverlay?: string | THREE.Color;
         transparent?: boolean;
       };
+      rawProgressiveBlurMaterial: ReactJSX.IntrinsicElements["shaderMaterial"];
     }
   }
 }

@@ -68,7 +68,7 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
               linewidth: 0.2,
               transparent: true,
               opacity: 0.02,
-            }) // `linewidth` работает только в native canvas (не WebGL)
+            })
           )
         }
       />

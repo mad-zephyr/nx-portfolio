@@ -10,7 +10,7 @@ import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { useMediaQuery } from "usehooks-ts";
 
 const imagePaths = Array.from(
-  { length: 27 },
+  { length: 25 },
   (_, i) => `/images/${i + 1}.avif`
 );
 

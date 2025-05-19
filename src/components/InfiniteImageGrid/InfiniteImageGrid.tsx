@@ -59,7 +59,6 @@ function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
 export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   textureUrls,
   gridSize = 10,
-
   imageSize = [5, 5],
   lerpFactor = 0.15,
 }) => {

@@ -18,12 +18,21 @@ const BASE_CAMERA_Z = 15;
 const SENSITIVITY = 1;
 const MAX_WORLD_DELTA = 2.5;
 
+type TCard = {
+  image: string;
+  brand: string;
+  project: string;
+  experience: string[];
+  year: number;
+};
+
 type InfiniteImageGridProps = {
   textureUrls: string[];
   gridSize?: number;
 
   imageSize?: [number, number];
   lerpFactor?: number;
+  cards: TCard[];
 };
 
 function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
@@ -89,12 +98,15 @@ function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
 }
 
 export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
-  textureUrls,
+  cards,
   gridSize = 10,
   imageSize = [5, 5],
   lerpFactor = 0.15,
 }) => {
-  const textures = useLoader(TextureLoader, textureUrls);
+  const textures = useLoader(
+    TextureLoader,
+    cards.map((card) => card.image)
+  );
   const meshRefs = useRef<Group[]>([]);
   const [isDrag, setIsDrag] = useState(false);
 
@@ -261,6 +273,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
               i={i}
               img={texture.source.data.currentSrc}
               imageSize={imageSizes}
+              card={cards[i % textures.length]}
             />
           </Billboard>
         );

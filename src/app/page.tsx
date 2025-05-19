@@ -9,6 +9,7 @@ import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useMediaQuery } from "usehooks-ts";
 import { ProgressiveBlurEffect } from "@/components/3d/shader/ProgressiveBlur";
+import { jsonData } from "@/mock/mock";
 
 const imagePaths = Array.from(
   { length: 25 },
@@ -35,6 +36,7 @@ export default function Home() {
           textureUrls={imagePaths}
           gridSize={10}
           imageSize={[6, 6]}
+          cards={jsonData}
         />
 
         <EffectComposer autoClear>

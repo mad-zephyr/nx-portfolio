@@ -76,13 +76,23 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
     </group>
   );
 };
+
+type TCard = {
+  image: string;
+  brand: string;
+  project: string;
+  experience: string[];
+  year: number;
+};
+
 type TWebGLCard = {
   img: string;
   i: number;
   imageSize: [number, number];
+  card: TCard;
 };
 
-export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize }) => {
+export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize, card }) => {
   const texture = useLoader(TextureLoader, img);
   const [hovered, setHovered] = useState<number>(0);
 
@@ -115,10 +125,10 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize }) => {
           >
             {/* текст */}
             <Box>
-              <Text fontSize={0.16}>Google {i}</Text>
+              <Text fontSize={0.16}>{card.brand}</Text>
             </Box>
             <Box>
-              <Text fontSize={0.16}>ZEDD IN THE PARK</Text>
+              <Text fontSize={0.16}>{card.project}</Text>
             </Box>
           </Box>
 
@@ -151,14 +161,17 @@ export const WebGLCard: FC<TWebGLCard> = ({ img, i, imageSize }) => {
                 EXPERIENCE:
               </Text>
             </Box>
+
+            {card.experience.map((item, i) => (
+              <Box key={i}>
+                <Text fontSize={0.13}>{item}</Text>
+              </Box>
+            ))}
+
             <Box>
-              <Text fontSize={0.13}>GAME</Text>
-            </Box>
-            <Box>
-              <Text fontSize={0.13}>3D</Text>
-            </Box>
-            <Box>
-              <Text fontSize={0.13}>2024 {i}</Text>
+              <Text fontSize={0.13}>
+                {card.year} {i}
+              </Text>
             </Box>
           </Box>
         </Flex>

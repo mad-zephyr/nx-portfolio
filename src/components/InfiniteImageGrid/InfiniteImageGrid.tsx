@@ -26,7 +26,11 @@ type InfiniteImageGridProps = {
   lerpFactor?: number;
 };
 
-function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
+function generateSpiralPositions(
+  gridSize: number,
+  spacing: number,
+  shiftRows: boolean = true
+): Vector3[] {
   const positions: Vector3[] = [];
 
   const half = Math.floor(gridSize / 2);
@@ -39,10 +43,18 @@ function generateSpiralPositions(gridSize: number, spacing: number): Vector3[] {
 
   for (let i = 0; i < total; i++) {
     if (-half <= x && x <= half && -half <= y && y <= half) {
-      positions.push(new Vector3(x * spacing, y * spacing, 0));
+      // сначала формируем сдвиг по рядам
+      let shiftedX = x;
+      const shiftedY = y;
+
+      if (shiftRows) {
+        if (y > 0) shiftedX += y; // вниз — вправо
+        else if (y < 0) shiftedX += y; // вверх — влево
+      }
+
+      positions.push(new Vector3(shiftedX * spacing, shiftedY * spacing, 0));
     }
 
-    // поворот против часовой стрелки по спирали
     if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
       const temp = dx;
       dx = -dy;

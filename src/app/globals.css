@@ -12,10 +12,6 @@ body {
   background: #181717;
 }
 
-canvas {
-  background: rgb(17, 16, 16);
-}
-
 img {
   user-select: none;
   -moz-user-select: none;

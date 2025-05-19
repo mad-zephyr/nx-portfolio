@@ -40,13 +40,13 @@ export default function Home() {
         <EffectComposer renderPriority={1} autoClear>
           <ProgressiveBlurEffect
             blurStrength={1.0}
-            overlayAlpha={0.15}
+            overlayAlpha={0.1}
             overlayColor={[1.0, 1.0, 1.0]}
-            blurArea={[0.0, 0.86, 1, 0.1]}
+            blurArea={matches ? [0.0, 0.82, 1, 0.2] : [0.0, 0.86, 1, 0.085]}
           />
           <AntiFisheye strength={matches ? 0.05 : 0.15} />
           {/* <Noise opacity={0.05} /> */}
-          <Vignette offset={0.15} darkness={1} />
+          <Vignette offset={0.15} darkness={1.2} />
         </EffectComposer>
       </Canvas>
     </section>

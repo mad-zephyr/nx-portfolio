@@ -5,82 +5,68 @@ import { Effect } from "postprocessing";
 const fragmentShader = /* glsl */ `
 precision highp float;
 
-uniform vec2 uResolution;
 uniform float uTime;
-uniform sampler2D tDiffuse;
+uniform float uBlurStrength;
 uniform vec4 blurArea;
-uniform float blurStrength;
-uniform vec3 overlayColor;  // белый или любой другой
-uniform float overlayAlpha; // от 0 до 1
+uniform vec3 overlayColor;
+uniform float overlayAlpha;
+uniform sampler2D tMap;
 
-// noise utils
-vec3 mod289(vec3 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
+float tvNoise(vec2 p, float ta, float tb) {
+  return fract(sin(p.x * ta + p.y * tb) * 5678.0);
 }
-vec2 mod289(vec2 x) {
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
+
+vec3 draw(sampler2D image, vec2 uv) {
+  return texture(image, uv).rgb;
 }
-vec3 permute(vec3 x) {
-  return mod289(((x * 34.0) + 10.0) * x);
+
+float rand(vec2 co) {
+  return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
-float snoise(vec2 v) {
-  const vec4 C = vec4(
-    0.211324865405187,
-    0.366025403784439,
-   -0.577350269189626,
-    0.024390243902439
-  );
-  vec2 i = floor(v + dot(v, C.yy));
-  vec2 x0 = v - i + dot(i, C.xx);
-  vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-  i = mod289(i);
-  vec3 p = permute(
-    permute(i.y + vec3(0.0, i1.y, 1.0)) +
-    i.x + vec3(0.0, i1.x, 1.0)
-  );
-  vec3 m = max(
-    0.5 - vec3(
-      dot(x0, x0),
-      dot(x12.xy, x12.xy),
-      dot(x12.zw, x12.zw)
-    ),
-    0.0
-  );
-  m *= m;
-  m *= m;
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-  m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
-  vec3 g;
-  g.x = a0.x * x0.x + h.x * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
+
+vec3 blur(vec2 uv, sampler2D image, float blurAmount, float strength) {
+  vec3 blurred = vec3(0.0);
+  const float steps = 8.0;
+
+  for (float x = -steps; x <= steps; x++) {
+    for (float y = -steps; y <= steps; y++) {
+      vec2 offset = vec2(x, y) * blurAmount * strength;
+      blurred += draw(image, uv + offset);
+    }
+  }
+
+  float total = (2.0 * steps + 1.0) * (2.0 * steps + 1.0);
+  return blurred / total;
 }
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outColor) {
-  vec2 texCoords = uv;
+  bool inBlurArea = (
+    uv.x >= blurArea.x &&
+    uv.x <= (blurArea.x + blurArea.z) &&
+    uv.y >= blurArea.y &&
+    uv.y <= (blurArea.y + blurArea.w)
+  );
 
-  float areaTop = blurArea.y + blurArea.w;
-  float areaBottom = blurArea.y;
-  float factor = smoothstep(areaBottom, areaTop, uv.y); // от 0 внизу до 1 вверху
+  float verticalFade = smoothstep(blurArea.y, blurArea.y + blurArea.w, uv.y);
+  float effectiveStrength = inBlurArea ? uBlurStrength * verticalFade : 0.0;
 
-  // мягкий шум с меньшей амплитудой и детализацией
-  float noise = snoise(gl_FragCoord.xy * 0.05 + uTime * 1.5); 
-  vec2 distortion = vec2(noise) * factor * blurStrength * 0.005;
+  vec3 base = draw(tMap, uv);
+  vec3 blurred = inBlurArea
+    ? blur(uv, tMap, 0.0015, effectiveStrength)
+    : base;
 
-  texCoords += distortion;
+  blurred = mix(blurred, overlayColor, verticalFade * overlayAlpha);
 
-  vec3 texColor = texture(tDiffuse, texCoords).rgb;
+  float t = uTime + 123.0;
+  float ta = t * 0.654321;
+  float tb = t * (ta * 0.123456);
+  float noise = tvNoise(uv, ta, tb) * 0.01; // 👈 мягкий
 
-  // добавляем белый (или другой) оверлей для "заморозки"
-  texColor = mix(texColor, overlayColor, factor * overlayAlpha);
+  vec3 final = blurred - vec3(noise); // или mix(blurred, vec3(1.0), noise * 0.5);
 
-  outColor = vec4(texColor, 1.0);
+  outColor = vec4(final, 1.0);
 }
+
 `;
 
 export class ProgressiveBlurEffectImpl extends Effect {
@@ -93,7 +79,7 @@ export class ProgressiveBlurEffectImpl extends Effect {
     super("ProgressiveBlurEffect", fragmentShader, {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       uniforms: new Map<string, any>([
-        ["blurStrength", { value: blurStrength }],
+        ["uBlurStrength", { value: blurStrength }],
         ["blurArea", { value: new Float32Array(blurArea) }],
         ["overlayColor", { value: new Float32Array(overlayColor) }],
         ["overlayAlpha", { value: overlayAlpha }],

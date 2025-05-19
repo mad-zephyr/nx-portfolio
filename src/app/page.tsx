@@ -36,15 +36,16 @@ export default function Home() {
           gridSize={10}
           imageSize={[6, 6]}
         />
+
         <EffectComposer renderPriority={1} autoClear>
           <ProgressiveBlurEffect
-            blurStrength={2.0}
-            overlayAlpha={0.3}
+            blurStrength={1.0}
+            overlayAlpha={0.15}
             overlayColor={[1.0, 1.0, 1.0]}
-            blurArea={[0.0, 0.879, 1, 0.1]} // Размытие верхней 20% части
+            blurArea={[0.0, 0.86, 1, 0.1]}
           />
-          <AntiFisheye strength={matches ? 0.05 : 0.1} />
-          <Noise opacity={0.05} />
+          <AntiFisheye strength={matches ? 0.05 : 0.15} />
+          {/* <Noise opacity={0.05} /> */}
           <Vignette offset={0.15} darkness={1} />
         </EffectComposer>
       </Canvas>

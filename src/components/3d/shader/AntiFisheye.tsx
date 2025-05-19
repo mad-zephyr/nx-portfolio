@@ -1,7 +1,7 @@
 // AntiFisheyeEffect.js
-import { Uniform, Vector2 } from 'three';
-import { Effect } from 'postprocessing';
 import { wrapEffect } from '@react-three/postprocessing';
+import { Effect } from 'postprocessing';
+import { Uniform, Vector2 } from 'three';
 
 const fragmentShader = /* glsl */ `
   uniform float uStrength;

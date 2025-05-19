@@ -1,4 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useRef } from 'react';
 import {
   CubeCamera,
   LinearMipmapLinearFilter,
@@ -6,7 +7,6 @@ import {
   RGBAFormat,
   WebGLCubeRenderTarget,
 } from 'three';
-import { useRef, useEffect } from 'react';
 
 export function FisheyeEffect() {
   const { scene, gl } = useThree();

@@ -6,7 +6,7 @@ import { AntiFisheye } from "@/components/shader/AntiFisheye";
 import classes from "./page.module.sass";
 
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useMediaQuery } from "usehooks-ts";
 import { ProgressiveBlurEffect } from "@/components/shader/ProgressiveBlur";
 

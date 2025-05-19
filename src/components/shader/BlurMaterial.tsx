@@ -82,7 +82,7 @@ export const BlurMaterial: FC<TBlurMaterial> = ({
       blurRef.current.uniforms.hovered.value = MathUtils.lerp(
         blurRef.current.uniforms.hovered.value,
         hovered ? 1 : 0,
-        0.45
+        0.5
       );
     }
   });

@@ -22,9 +22,10 @@ export default function Home() {
       <Canvas
         gl={{
           powerPreference: "high-performance",
-          alpha: true,
-          antialias: true,
-          stencil: true,
+          alpha: false,
+          antialias: false,
+          stencil: false,
+          autoClear: true,
         }}
         className={classes.wrapper}
         camera={{ position: [0, 0, 12], fov: 65 }}
@@ -34,10 +35,10 @@ export default function Home() {
           gridSize={10}
           imageSize={[6, 6]}
         />
-        <EffectComposer multisampling={2} enableNormalPass={true}>
+        <EffectComposer renderPriority={1} autoClear>
           <AntiFisheye strength={matches ? 0.05 : 0.1} />
           <Noise opacity={0.05} />
-          <Vignette offset={0.15} eskil={false} darkness={1} />
+          <Vignette offset={0.15} darkness={1} />
         </EffectComposer>
       </Canvas>
     </section>

@@ -155,7 +155,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     }
 
     const targetZ = isDrag ? 14 : 12;
-    camera.position.z = MathUtils.lerp(camera.position.z, targetZ, 0.3);
+    camera.position.z = MathUtils.lerp(camera.position.z, targetZ, 0.5);
   });
 
   const handlePointerDown = (e: PointerEvent) => {

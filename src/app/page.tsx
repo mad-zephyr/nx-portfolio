@@ -12,11 +12,6 @@ import { jsonData } from '@/mock/mock';
 
 import classes from './page.module.sass';
 
-const imagePaths = Array.from(
-  { length: 25 },
-  (_, i) => `/images/${i + 1}.avif`
-);
-
 export default function Home() {
   const matches = useMediaQuery('(max-width: 768px)');
 
@@ -35,7 +30,6 @@ export default function Home() {
           camera={{ position: [0, 0, 12], fov: 65 }}
         >
           <InfiniteImageGrid
-            textureUrls={imagePaths}
             gridSize={10}
             imageSize={[6, 6]}
             cards={jsonData}

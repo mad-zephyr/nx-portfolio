@@ -77,12 +77,13 @@ const BorderBox: FC<PropsWithChildren<TBorderBox>> = ({
   );
 };
 
-type TCard = {
+export type TCard = {
   image: string;
   brand: string;
   project: string;
   experience: string[];
   year: number;
+  url: string;
 };
 
 type TWebGLCard = {
@@ -93,6 +94,7 @@ type TWebGLCard = {
 
 export const WebGLCard: FC<TWebGLCard> = ({ img, imageSize, card }) => {
   const texture = useLoader(TextureLoader, img);
+
   const [hovered, setHovered] = useState<number>(0);
 
   const GAP = 1 / imageSize[0];

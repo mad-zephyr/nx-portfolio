@@ -10,6 +10,7 @@ const brands = [
   'CodeCraft',
   'Websmiths',
 ];
+
 const projectNames = [
   'Portfolio Website',
   'E-Commerce Platform',
@@ -17,24 +18,32 @@ const projectNames = [
   'Booking App',
   'Dashboard',
 ];
+
 const experienceTypes = ['UX/UI', 'Frontend', 'Backend'];
 
 const getRandomFromArray = (arr: string[]) =>
   arr[Math.floor(Math.random() * arr.length)];
+
 const getRandomYear = () => Math.floor(Math.random() * 6) + 2020;
 
 const getRandomExperience = () => {
   const count = Math.random() > 0.5 ? 2 : 3;
   const shuffled = [...experienceTypes].sort(() => 0.5 - Math.random());
-  const d = shuffled.slice(0, count);
-
-  return d;
+  return shuffled.slice(0, count);
 };
 
-export const jsonData = imagePaths.map((path) => ({
-  image: path,
-  brand: getRandomFromArray(brands),
-  project: getRandomFromArray(projectNames),
-  experience: getRandomExperience(),
-  year: getRandomYear(),
-}));
+const generateProjectURL = (project: string) =>
+  `/${project.toLowerCase().replace(/\s+/g, '-')}`;
+
+export const jsonData = imagePaths.map((path) => {
+  const project = `${getRandomFromArray(brands)} ${getRandomFromArray(projectNames)}`;
+
+  return {
+    image: path,
+    brand: getRandomFromArray(brands),
+    project,
+    experience: getRandomExperience(),
+    year: getRandomYear(),
+    url: generateProjectURL(project),
+  };
+});

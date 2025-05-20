@@ -2,7 +2,8 @@
 
 import { Billboard } from '@react-three/drei';
 import { useFrame, useLoader, useThree } from '@react-three/fiber';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Group,
   MathUtils,
@@ -14,24 +15,14 @@ import {
 
 import { useResponsiveImageSize } from '@/hooks/useResponsiveImageSize';
 
-import { WebGLCard } from '../WebGLCard/WebGLCard';
+import { TCard, WebGLCard } from '../WebGLCard/WebGLCard';
 
 const BASE_CAMERA_Z = 15;
 const SENSITIVITY = 1;
 const MAX_WORLD_DELTA = 2.5;
 
-type TCard = {
-  image: string;
-  brand: string;
-  project: string;
-  experience: string[];
-  year: number;
-};
-
 type InfiniteImageGridProps = {
-  textureUrls: string[];
   gridSize?: number;
-
   imageSize?: [number, number];
   lerpFactor?: number;
   cards: TCard[];
@@ -109,14 +100,20 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     TextureLoader,
     cards.map((card) => card.image)
   );
+
+  const { push } = useRouter();
+
   const meshRefs = useRef<Group[]>([]);
-  const [isDrag, setIsDrag] = useState(false);
+  // const [isDrag, setIsDrag] = useState(false);
 
   const { imageSizes, spacing } = useResponsiveImageSize({ imageSize });
 
   const targetOffset = useRef(new Vector2(0, 0));
   const currentOffset = useRef(new Vector2(0, 0));
   const pointerDown = useRef(false);
+
+  const isDraggingRef = useRef(false);
+
   const lastPos = useRef<Vector2 | null>(null);
 
   const { camera, size } = useThree();
@@ -168,14 +165,15 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
       ref.position.set(x, y, 0);
     }
 
-    const targetZ = isDrag ? 14 : 12;
+    const targetZ = isDraggingRef.current ? 14 : 12;
     camera.position.z = MathUtils.lerp(camera.position.z, targetZ, 0.5);
   });
 
   const handlePointerDown = (e: PointerEvent) => {
     pointerDown.current = true;
+    isDraggingRef.current = false;
     lastPos.current = new Vector2(e.clientX, e.clientY);
-    setIsDrag(true);
+    // setIsDrag(true);
   };
 
   const handlePointerMove = useCallback(
@@ -185,6 +183,15 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
       if (!lastPos.current) {
         lastPos.current = current;
         return;
+      }
+
+      const DRAG_THRESHOLD = 3;
+
+      if (pointerDown.current && lastPos.current) {
+        const dragDistance = current.distanceTo(lastPos.current);
+        if (dragDistance > DRAG_THRESHOLD) {
+          isDraggingRef.current = true;
+        }
       }
 
       const delta = current.clone().sub(lastPos.current);
@@ -207,7 +214,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
       const zRatio = distance / perspectiveCamera.position.z;
       const finalDelta = clampedDelta.multiplyScalar(SENSITIVITY / zRatio);
 
-      if (pointerDown.current && isDrag) {
+      if (pointerDown.current && isDraggingRef.current) {
         // полный scroll при перетаскивании
         targetOffset.current.add(finalDelta);
       } else {
@@ -215,7 +222,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
         targetOffset.current.add(finalDelta.multiplyScalar(0.05));
       }
     },
-    [camera, isDrag, size.height, size.width]
+    [camera, size.height, size.width]
   );
 
   const handleWheel = (e: WheelEvent) => {
@@ -243,16 +250,19 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
   const handlePointerUp = () => {
     pointerDown.current = false;
     lastPos.current = null;
-    setIsDrag(false);
+
+    setTimeout(() => {
+      isDraggingRef.current = false;
+    }, 0);
   };
 
   return (
     <>
       <mesh
         position={[0, 0, 0]}
+        onPointerUp={handlePointerUp}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
         onWheel={handleWheel}
       >
@@ -265,6 +275,9 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
 
         return (
           <Billboard
+            onClick={() =>
+              !isDraggingRef.current && push(cards[i % textures.length].url)
+            }
             key={i}
             ref={(el) => {
               if (el) meshRefs.current[i] = el;

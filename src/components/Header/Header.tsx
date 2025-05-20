@@ -1,16 +1,20 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useAnimationInOut } from '@/hooks';
 
 import { Button } from '../ui';
 import classes from './styles.module.sass';
 
 export const Header = () => {
-  const { push } = useRouter();
+  const { animatePageOut } = useAnimationInOut();
+
+  const handleClick = (href: string) => {
+    animatePageOut(href);
+  };
 
   return (
     <header className={classes.header}>
-      <div className={classes.logo} onClick={() => push('/')}>
+      <div className={classes.logo} onClick={() => handleClick('/')}>
         NX
       </div>
 
@@ -19,7 +23,10 @@ export const Header = () => {
         <br /> that work <i>for business</i>
       </div>
 
-      <Button className={classes.cta} onClick={() => push('/google')}>
+      <Button
+        className={classes.cta}
+        onClick={() => handleClick('/connect-page')}
+      >
         Let`s Talk
       </Button>
     </header>

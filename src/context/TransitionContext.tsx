@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, ReactElement } from 'react';
+import React, { createContext, PropsWithChildren } from 'react';
 import { useState } from 'react';
 
 type TTransitionContext = {
@@ -13,11 +13,7 @@ const TransitionContext = createContext<TTransitionContext>({
   toggleCompleted: () => null,
 });
 
-export const TransitionProvider = ({
-  children,
-}: {
-  children: ReactElement;
-}) => {
+export const TransitionProvider = ({ children }: PropsWithChildren) => {
   const [completed, setCompleted] = useState(false);
 
   const toggleCompleted = (value: boolean) => {

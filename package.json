@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev ",
     "build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,6 @@
     "@react-three/fiber": "^9.1.2",
     "@react-three/flex": "^1.0.1",
     "@react-three/postprocessing": "^3.0.4",
-    "@types/react-transition-group": "^4.4.12",
     "clsx": "^2.1.1",
     "gsap": "^3.13.0",
     "leva": "^0.10.0",
@@ -23,6 +22,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-transition-group": "^4.4.5",
+    "react-transition-state": "^2.3.1",
     "three": "^0.176.0",
     "usehooks-ts": "^3.1.1"
   },

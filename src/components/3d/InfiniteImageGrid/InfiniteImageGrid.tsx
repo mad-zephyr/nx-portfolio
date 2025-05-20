@@ -2,7 +2,6 @@
 
 import { Billboard } from '@react-three/drei';
 import { useFrame, useLoader, useThree } from '@react-three/fiber';
-import { useRouter } from 'next/navigation';
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Group,
@@ -13,6 +12,7 @@ import {
   Vector3,
 } from 'three';
 
+import { useAnimationInOut } from '@/hooks';
 import { useResponsiveImageSize } from '@/hooks/useResponsiveImageSize';
 
 import { TCard, WebGLCard } from '../WebGLCard/WebGLCard';
@@ -101,12 +101,9 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     cards.map((card) => card.image)
   );
 
-  const { push } = useRouter();
+  const { animatePageOut } = useAnimationInOut();
 
   const meshRefs = useRef<Group[]>([]);
-  // const [isDrag, setIsDrag] = useState(false);
-
-  const { imageSizes, spacing } = useResponsiveImageSize({ imageSize });
 
   const targetOffset = useRef(new Vector2(0, 0));
   const currentOffset = useRef(new Vector2(0, 0));
@@ -118,12 +115,13 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
 
   const { camera, size } = useThree();
 
-  const fieldSize = gridSize * spacing;
-
+  const { imageSizes, spacing } = useResponsiveImageSize({ imageSize });
   const [tileWidth, tileHeight] = imageSizes;
 
   const fieldWidth = gridSize * tileWidth;
   const fieldHeight = gridSize * tileHeight;
+
+  const fieldSize = gridSize * spacing;
 
   const tilePositions = useMemo(() => {
     return generateSpiralPositions(gridSize, spacing);
@@ -173,7 +171,6 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     pointerDown.current = true;
     isDraggingRef.current = false;
     lastPos.current = new Vector2(e.clientX, e.clientY);
-    // setIsDrag(true);
   };
 
   const handlePointerMove = useCallback(
@@ -267,18 +264,22 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
         onWheel={handleWheel}
       >
         <planeGeometry args={[fieldWidth * 3, fieldHeight * 3]} />
-        <meshBasicMaterial transparent opacity={0.001} />
+        <meshBasicMaterial transparent opacity={0.0} />
       </mesh>
 
       {tilePositions.map((pos, i) => {
         const texture = textures[i % textures.length];
 
+        const handleClick = (href: string) => {
+          if (!isDraggingRef.current) {
+            animatePageOut(href);
+          }
+        };
+
         return (
           <Billboard
-            onClick={() =>
-              !isDraggingRef.current && push(cards[i % textures.length].url)
-            }
             key={i}
+            onClick={() => handleClick(cards[i % textures.length].url)}
             ref={(el) => {
               if (el) meshRefs.current[i] = el;
             }}

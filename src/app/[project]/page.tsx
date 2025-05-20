@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import TransitionComponent from '@/components/Transitions';
+import { View } from './_components/view';
 
 type TPage = {
   params: Promise<{
@@ -8,17 +8,8 @@ type TPage = {
   }>;
 };
 
-const Page: FC<TPage> = async (props) => {
-  const params = await props.params;
-
-  return (
-    <TransitionComponent>
-      <>
-        <section style={{ padding: '5rem 1rem', color: 'wheat' }}>
-          Section: {params.project}
-        </section>
-      </>
-    </TransitionComponent>
-  );
+const Page: FC<TPage> = async () => {
+  return <View />;
 };
+
 export default Page;

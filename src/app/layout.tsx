@@ -1,14 +1,7 @@
-import './globals.css';
+import './globals.sass';
 
 import type { Metadata } from 'next';
-import { Geist, Onest } from 'next/font/google';
-
-import { TransitionProvider } from '@/context';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+import { Onest } from 'next/font/google';
 
 const onest = Onest({
   variable: '--font-onest',
@@ -26,12 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <TransitionProvider>
-      <html lang="en">
-        <body className={`${geistSans.variable} ${onest.variable}`}>
-          {children}
-        </body>
-      </html>
-    </TransitionProvider>
+    <html lang="en">
+      <body className={`${onest.variable}`}>{children}</body>
+    </html>
   );
 }

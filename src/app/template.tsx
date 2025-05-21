@@ -3,19 +3,22 @@
 import { FC, PropsWithChildren, useEffect } from 'react';
 
 import { Header } from '@/components';
-import { animatePageIn } from '@/libs/animations';
+import { animatePageOut } from '@/libs/animations';
 
 const Template: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
-    animatePageIn();
+    animatePageOut();
   }, []);
 
   return (
-    <div>
-      <div id="transition-element" />
+    <>
+      <div
+        id="transition-element"
+        style={{ background: 'var(--main-color)' }}
+      />
       <Header />
       {children}
-    </div>
+    </>
   );
 };
 

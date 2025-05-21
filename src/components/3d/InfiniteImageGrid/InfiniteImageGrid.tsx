@@ -101,7 +101,7 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
     cards.map((card) => card.image)
   );
 
-  const { animatePageOut } = useAnimationInOut();
+  const { animatePageIn } = useAnimationInOut();
 
   const meshRefs = useRef<Group[]>([]);
 
@@ -270,16 +270,20 @@ export const InfiniteImageGrid: FC<InfiniteImageGridProps> = ({
       {tilePositions.map((pos, i) => {
         const texture = textures[i % textures.length];
 
-        const handleClick = (href: string) => {
+        const handleClick = (card: TCard) => {
           if (!isDraggingRef.current) {
-            animatePageOut(href);
+            animatePageIn({
+              href: card.url,
+              mainColor: card.background,
+              secondaryColor: card.color,
+            });
           }
         };
 
         return (
           <Billboard
             key={i}
-            onClick={() => handleClick(cards[i % textures.length].url)}
+            onClick={() => handleClick(cards[i % textures.length])}
             ref={(el) => {
               if (el) meshRefs.current[i] = el;
             }}

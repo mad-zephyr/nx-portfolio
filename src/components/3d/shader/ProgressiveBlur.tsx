@@ -65,10 +65,12 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outColor) {
   float tb = t * (ta * 0.123456);
   float noise = tvNoise(uv * 100.0 + vec2(uTime * 0.5, uTime * 0.8), ta, tb) * 0.01 * verticalFade;
 
-  // vec3 final = blurred - vec3(noise); // или mix(blurred, vec3(1.0), noise * 0.5);
   vec3 final = mix(blurred, vec3(1.0), noise * 0.5);
 
   outColor = vec4(final, 1.0);
+
+  // vec3 composed = mix(base, final, verticalFade);
+  // outColor = vec4(composed, inputColor.a);
 }
 
 `;

@@ -2,19 +2,29 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { animatePageIn, animatePageOut } from '@/libs/animations';
+import {
+  animatePageIn,
+  animatePageOut,
+  TAnimatePageProps,
+} from '@/libs/animations';
 
 export const useAnimationInOut = () => {
   const router = useRouter();
   const pathname = usePathname();
 
   return {
-    animatePageOut: (href: string) => {
-      if (pathname !== href) {
-        animatePageOut(href, router);
-      }
+    animatePageOut: () => {
+      animatePageOut();
     },
 
-    animatePageIn: animatePageIn,
+    animatePageIn: ({
+      href,
+      mainColor,
+      secondaryColor,
+    }: Omit<TAnimatePageProps, 'router'>) => {
+      if (pathname !== href) {
+        animatePageIn({ href, router, mainColor, secondaryColor });
+      }
+    },
   };
 };

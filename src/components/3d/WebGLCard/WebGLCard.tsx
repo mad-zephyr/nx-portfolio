@@ -84,6 +84,8 @@ export type TCard = {
   experience: string[];
   year: number;
   url: string;
+  background: string;
+  color: string;
 };
 
 type TWebGLCard = {

@@ -6,10 +6,10 @@ import { Button } from '../ui';
 import classes from './styles.module.sass';
 
 export const Header = () => {
-  const { animatePageOut } = useAnimationInOut();
+  const { animatePageIn } = useAnimationInOut();
 
   const handleClick = (href: string) => {
-    animatePageOut(href);
+    animatePageIn({ href, mainColor: '#222', secondaryColor: '#fff' });
   };
 
   return (

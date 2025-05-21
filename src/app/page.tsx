@@ -19,21 +19,19 @@ export default function Home() {
       <Canvas
         gl={{
           powerPreference: 'high-performance',
-          alpha: false,
-          antialias: false,
-          stencil: false,
-          autoClear: true,
+          autoClear: false,
+          alpha: true,
         }}
         className={classes.wrapper}
         camera={{ position: [0, 0, 12], fov: 65 }}
       >
-        <color attach="background" args={['#131212']} />
+        <color attach="background" args={['#222']} />
         <InfiniteImageGrid gridSize={10} imageSize={[6, 6]} cards={jsonData} />
 
         <EffectComposer autoClear>
           <ProgressiveBlurEffect
-            blurStrength={1.0}
-            overlayAlpha={0.05}
+            blurStrength={1.5}
+            overlayAlpha={0.03}
             overlayColor={[1.0, 1.0, 1.0]}
             blurArea={matches ? [0.0, 0.82, 1, 0.2] : [0.0, 0.86, 1, 0.085]}
           />

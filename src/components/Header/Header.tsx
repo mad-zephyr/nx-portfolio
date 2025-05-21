@@ -25,7 +25,13 @@ export const Header = () => {
 
       <Button
         className={classes.cta}
-        onClick={() => handleClick('/connect-page')}
+        onClick={() => {
+          animatePageIn({
+            href: '/connect-page',
+            mainColor: '#3F88C5',
+            secondaryColor: '#fff',
+          });
+        }}
       >
         Let`s Talk
       </Button>

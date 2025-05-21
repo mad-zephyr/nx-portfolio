@@ -27,11 +27,13 @@ export const animatePageIn = ({
 
     tl2
       .set(body, {
-        '--main-color': getStyles('--main-color'),
-        '--secondary-color': getStyles('--secondary-color'),
+        '--transition-color': getStyles('--transition-color'),
       })
       .to(body, {
         duration: 0.8,
+        '--transition-color': mainColor,
+      })
+      .set(body, {
         '--main-color': mainColor,
         '--secondary-color': secondaryColor,
       });
@@ -40,22 +42,21 @@ export const animatePageIn = ({
       yPercent: 100,
       opacity: 1,
       display: 'unset',
-    })
-      .to(animationWrapper, {
-        yPercent: 0,
-        duration: 0.8,
-        onComplete: () => {
-          router.push(href);
-        },
-      })
+    }).to(animationWrapper, {
+      yPercent: 0,
+      duration: 0.8,
+      onComplete: () => {
+        router.push(href);
+      },
+    });
 
-      .to(
-        animationWrapper,
-        {
-          duration: 0.4,
-        },
-        '<'
-      );
+    // .to(
+    //   animationWrapper,
+    //   {
+    //     duration: 0.4,
+    //   },
+    //   '<'
+    // );
   }
 };
 
@@ -76,13 +77,15 @@ export const animatePageOut = () => {
       })
       .set(animationWrapper, {
         display: 'none',
-      })
-      .to(
-        animationWrapper,
-        {
-          duration: 0.4,
-        },
-        '<'
-      );
+        yPercent: -100,
+      });
+
+    // .to(
+    //   animationWrapper,
+    //   {
+    //     duration: 0.4,
+    //   },
+    //   '<'
+    // );
   }
 };

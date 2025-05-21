@@ -14,7 +14,7 @@ const Template: FC<PropsWithChildren> = ({ children }) => {
     <>
       <div
         id="transition-element"
-        style={{ background: 'var(--main-color)' }}
+        style={{ background: 'var(--transition-color)' }}
       />
       <Header />
       {children}

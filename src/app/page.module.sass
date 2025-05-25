@@ -9,3 +9,16 @@
 
   &:active
     cursor: grabbing
+
+.transiton
+  --a-start: 0
+  --a-mid: 0.6
+  --stop: 60%
+
+  display: grid
+  place-items: center
+  background: linear-gradient(180deg, rgb(var(--transition-color), var(--a-start)) 0%, rgb(var(--transition-color), var(--a-mid)) var(--stop), rgb(var(--transition-color), 1) 100%)
+
+.transitonProgress
+  color: white
+  z-index: 3

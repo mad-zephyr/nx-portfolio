@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 
+import { useAppStore } from '@/context';
 import {
   animatePageIn,
   animatePageOut,
@@ -11,6 +12,8 @@ import {
 export const useAnimationInOut = () => {
   const router = useRouter();
   const pathname = usePathname();
+
+  const { setIsMainpage } = useAppStore.getState();
 
   return {
     animatePageOut: () => {
@@ -23,6 +26,7 @@ export const useAnimationInOut = () => {
       secondaryColor,
     }: Omit<TAnimatePageProps, 'router'>) => {
       if (pathname !== href) {
+        setIsMainpage(href === '/');
         animatePageIn({ href, router, mainColor, secondaryColor });
       }
     },

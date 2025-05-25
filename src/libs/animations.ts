@@ -1,6 +1,8 @@
 import gsap from 'gsap';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
+import { hexToRgb } from './hexToRgb';
+
 export type TAnimatePageProps = {
   href: string;
   router: AppRouterInstance;
@@ -31,20 +33,24 @@ export const animatePageIn = ({
       })
       .to(body, {
         duration: 0.8,
-        '--transition-color': mainColor,
+        '--transition-color': hexToRgb(mainColor),
       })
       .set(body, {
-        '--main-color': mainColor,
-        '--secondary-color': secondaryColor,
+        '--main-color': hexToRgb(mainColor),
+        '--secondary-color': hexToRgb(secondaryColor),
       });
 
     tl.set(animationWrapper, {
-      yPercent: 100,
+      yPercent: 0,
       opacity: 1,
-      display: 'unset',
+      display: 'grid',
     }).to(animationWrapper, {
       yPercent: 0,
+      '--a-start': 1, // 0 → 1
+      '--a-mid': 1, // 0.6 → 1
+      '--stop': '100%',
       duration: 0.8,
+      ease: 'power1.out',
       onComplete: () => {
         router.push(href);
       },
@@ -70,11 +76,15 @@ export const animatePageOut = () => {
       yPercent: 0,
       opacity: 1,
     })
-      .to(animationWrapper, {
-        // yPercent: -100,
-        opacity: 0,
-        duration: 0.8,
-      })
+      .to(
+        animationWrapper,
+        {
+          // yPercent: -100,
+          opacity: 0,
+          duration: 0.8,
+        },
+        0.8
+      )
       .set(animationWrapper, {
         display: 'none',
         yPercent: -100,

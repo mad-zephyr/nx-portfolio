@@ -49,8 +49,8 @@ export const animatePageIn = ({
       '--a-start': 1, // 0 → 1
       '--a-mid': 1, // 0.6 → 1
       '--stop': '100%',
-      duration: 0.8,
-      ease: 'power1.out',
+      duration: 1.2,
+      ease: 'power1.inOut',
       onComplete: () => {
         router.push(href);
       },

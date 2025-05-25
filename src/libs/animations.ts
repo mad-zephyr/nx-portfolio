@@ -83,7 +83,7 @@ export const animatePageOut = () => {
           opacity: 0,
           duration: 0.8,
         },
-        0.8
+        1.2
       )
       .set(animationWrapper, {
         display: 'none',
